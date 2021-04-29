@@ -6,7 +6,7 @@ const { setupDb } = require('__jest__/datastore')
 const { DatabaseModel } = require('djorm/models')
 const { TargetStream } = require('__mocks__/TargetStream')
 
-describe.skip('datastore select', () => {
+describe('datastore select', () => {
   let models
 
   setupDb(path.resolve(__dirname, '..', '__samples__', 'users-trivial.js'))
@@ -158,6 +158,38 @@ describe.skip('datastore select', () => {
 
   it('selects last superadmin', async () => {
     const result = await models.User.objects.filter({ superuser: true }).last()
+    expect(result).toEqual(
+      new models.User({
+        id: 4,
+        name: 'Merver Chin',
+        email: 'merver.chin@gmail.com',
+        superuser: true,
+        inactive: false
+      })
+    )
+  })
+
+  it('selects user by id', async () => {
+    const result = await models.User.objects.get({ id: 4 })
+    expect(result).toEqual(
+      new models.User({
+        id: 4,
+        name: 'Merver Chin',
+        email: 'merver.chin@gmail.com',
+        superuser: true,
+        inactive: false
+      })
+    )
+  })
+
+  it('ignores undefined conditions', async () => {
+    const result = await models.User.objects
+      .filter({
+        name: 'Merver Chin',
+        superuser: undefined,
+        inactive: undefined
+      })
+      .first()
     expect(result).toEqual(
       new models.User({
         id: 4,
